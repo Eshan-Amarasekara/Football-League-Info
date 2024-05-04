@@ -5,8 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class League(
-    @PrimaryKey(autoGenerate = true) var id: Int=0,
-    val idLeague: Int?,
+    @PrimaryKey(autoGenerate = true) val idLeague: Int,
     val strLeague: String?,
     val strSport: String?,
     val strLeagueAlternate: String?
