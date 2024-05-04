@@ -66,8 +66,7 @@ fun GUI() {
 
         val scope = rememberCoroutineScope()
         var message by rememberSaveable { mutableStateOf<String>("") }
-        var keyword by rememberSaveable { mutableStateOf("") }
-        var leagueInfoList by remember { mutableStateOf<List<LeagueInfo>>(emptyList()) }
+
         Row() {
             Button(
                 onClick = {

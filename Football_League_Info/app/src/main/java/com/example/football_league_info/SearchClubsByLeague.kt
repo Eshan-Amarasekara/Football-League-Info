@@ -1,6 +1,7 @@
 package com.example.football_league_info
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
+import org.json.JSONException
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -53,7 +57,7 @@ fun GUIButton2() {
     Column {
         val scope = rememberCoroutineScope()
         var keyword by rememberSaveable { mutableStateOf("") }
-        var leagueInfoList by remember { mutableStateOf<List<LeagueInfo>>(emptyList()) }
+        var displayLeagues by rememberSaveable { mutableStateOf("") }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(8.dp)
@@ -68,69 +72,25 @@ fun GUIButton2() {
             Button(
                 onClick = {
                     scope.launch {
-                        leagueInfoList = fetchLeagueDetails(keyword)
+                        displayLeagues = fetchLeagueDetails(keyword)
                     }
                 },
                 modifier = Modifier.padding(top = 8.dp)
             ) {
                 Text("Search")
             }
-        }
 
-        LazyColumn {
-            items(leagueInfoList) { leagueInfo ->
-                LeagueInfoItem(leagueInfo)
-                Divider()
-            }
+            Text(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                text = displayLeagues
+            )
         }
     }
 }
 
-
-@Composable
-fun LeagueInfoItem(leagueInfo: LeagueInfo) {
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-    ) {
-        Text("idTeam:${leagueInfo.idTeam}")
-        Text("Name: ${leagueInfo.name}")
-        Text("strTeamShort: ${leagueInfo.strTeamShort}")
-        Text("strAlternate: ${leagueInfo.strAlternate}")
-        Text("intFormedYear: ${leagueInfo.intFormedYear}")
-        Text("strLeague: ${leagueInfo.strLeague}")
-        Text("strStadium: ${leagueInfo.strStadium}")
-        Text("strKeywords: ${leagueInfo.strKeywords}")
-        Text("strStadiumThumb: ${leagueInfo.strStadiumThumb}")
-        Text("intStadiumCapacity: ${leagueInfo.intStadiumCapacity}")
-        Text("strWebsite: ${leagueInfo.strWebsite}")
-        Text("strTeamJersey: ${leagueInfo.strTeamJersey}")
-        Text("strTeamLogo: ${leagueInfo.strTeamLogo}")
-
-    }
-}
-
-data class LeagueInfo(
-    val idTeam: String,
-    val name: String,
-    val strTeamShort: String,
-    val strAlternate: String,
-    val intFormedYear: String,
-    val strLeague: String,
-    val strStadium: String,
-    val strKeywords: String,
-    val strStadiumThumb: String,
-    val strStadiumLocation: String,
-    val intStadiumCapacity: String,
-    val strWebsite: String,
-    val strTeamJersey: String,
-    val strTeamLogo: String
-)
-
-suspend fun fetchLeagueDetails(keyword: String): List<LeagueInfo> {
-    val url_string = "https://www.thesportsdb.com/api/v1/json/3/search_all_leagues.php?c=$keyword&s=Soccer"
-    val url = URL(url_string)
+suspend fun fetchLeagueDetails(keyword: String): String {
+    val urlString = "https://www.thesportsdb.com/api/v1/json/3/search_all_teams.php?l="+keyword
+    val url = URL(urlString)
     val con: HttpURLConnection = url.openConnection() as HttpURLConnection
     var stb = StringBuilder()
 
@@ -142,50 +102,52 @@ suspend fun fetchLeagueDetails(keyword: String): List<LeagueInfo> {
             line = bf.readLine()
         }
     }
-
-    return parseLeagueJSON(stb)
+    val allLeagues = parseJSON(stb)
+    return allLeagues
 }
 
-fun parseLeagueJSON(stb: StringBuilder): List<LeagueInfo> {
-    val jsonArray = JSONArray(stb.toString())
-    val leagueInfoList = mutableListOf<LeagueInfo>()
+fun parseJSON(stb: StringBuilder): String {
 
-    for (i in 0 until jsonArray.length()) {
-        val jsonObject = jsonArray.getJSONObject(i)
-        val idTeam = jsonObject.getString("idLeague")
-        val name = jsonObject.getString("strTeam")
-        val strTeamShort = jsonObject.getString("strTeamShort")
-        val strAlternate = jsonObject.getString("strAlternate")
-        val intFormedYear = jsonObject.getString("intFormedYear")
-        val strLeague = jsonObject.getString("strLeague")
-        val strStadium = jsonObject.getString("strStadium")
-        val strKeywords = jsonObject.getString("strKeywords")
-        val strStadiumThumb = jsonObject.getString("strStadiumThumb")
-        val strStadiumLocation = jsonObject.getString("strStadiumLocation")
-        val intStadiumCapacity = jsonObject.getString("intStadiumCapacity")
-        val strWebsite = jsonObject.getString("strWebsite")
-        val strTeamJersey = jsonObject.getString("strTeamJersey")
-        val strTeamLogo = jsonObject.getString("strTeamLogo")
+    val json = JSONArray(stb.toString())
+    val allLeagues = StringBuilder()
 
+    for (i in 0 until json.length()) {
+        val jsonObject = json.getJSONObject(i)
+        try {
+            val idTeam = jsonObject.getString("idTeam")
+            val name = jsonObject.getString("strTeam")
+            val strTeamShort = jsonObject.getString("strTeamShort")
+            val strAlternate = jsonObject.getString("strAlternate")
+            val intFormedYear = jsonObject.getString("intFormedYear")
+            val strLeague = jsonObject.getString("strLeague")
+            val strStadium = jsonObject.getString("strStadium")
+            val strKeywords = jsonObject.getString("strKeywords")
+            val strStadiumThumb = jsonObject.getString("strStadiumThumb")
+            val strStadiumLocation = jsonObject.getString("strStadiumLocation")
+            val intStadiumCapacity = jsonObject.getString("intStadiumCapacity")
+            val strWebsite = jsonObject.getString("strWebsite")
+            val strTeamJersey = jsonObject.getString("strTeamJersey")
+            val strTeamLogo = jsonObject.getString("strTeamLogo")
 
-        val leagueInfo = LeagueInfo(
-            idTeam = idTeam,
-            name= name,
-            strTeamShort = strTeamShort,
-            strAlternate = strAlternate,
-            intFormedYear = intFormedYear,
-            strLeague = strLeague,
-            strStadium = strStadium,
-            strKeywords = strKeywords,
-            strStadiumThumb = strStadiumThumb,
-            strStadiumLocation = strStadiumLocation,
-            intStadiumCapacity = intStadiumCapacity,
-            strWebsite = strWebsite,
-            strTeamJersey = strTeamJersey,
-            strTeamLogo = strTeamLogo
-        )
-        leagueInfoList.add(leagueInfo)
+            allLeagues.append("idTeam: $idTeam\n")
+            allLeagues.append("name: $name\n")
+            allLeagues.append("strTeamShort: $strTeamShort\n")
+            allLeagues.append("strAlternate: $strAlternate\n")
+            allLeagues.append("intFormedYear: $intFormedYear\n")
+            allLeagues.append("strLeague: $strLeague\n")
+            allLeagues.append("strStadium: $strStadium\n")
+            allLeagues.append("strKeywords: $strKeywords\n")
+            allLeagues.append("strStadiumThumb: $strStadiumThumb\n")
+            allLeagues.append("strStadiumLocation: $strStadiumLocation\n")
+            allLeagues.append("intStadiumCapacity: $intStadiumCapacity\n")
+            allLeagues.append("strWebsite: $strWebsite\n")
+            allLeagues.append("strTeamJersey: $strTeamJersey\n")
+            allLeagues.append("strTeamLogo: $strTeamLogo\n")
+
+        }catch (jen: JSONException){
+            Log.d("Error","Error")
+        }
     }
 
-    return leagueInfoList
+    return allLeagues.toString()
 }
