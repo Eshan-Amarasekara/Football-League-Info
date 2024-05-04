@@ -1,43 +1,33 @@
 package com.example.football_league_info
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.football_league_info.ui.theme.Football_League_InfoTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -108,26 +98,28 @@ suspend fun fetchLeagueDetails(keyword: String): String {
 
 fun parseJSON(stb: StringBuilder): String {
 
-    val json = JSONArray(stb.toString())
+    val json = JSONObject(stb.toString())
     val allLeagues = StringBuilder()
+    var jsonArray: JSONArray = json.getJSONArray("teams")
 
-    for (i in 0 until json.length()) {
-        val jsonObject = json.getJSONObject(i)
+    for (i in 0 until jsonArray.length()) {
+        val teams: JSONObject = jsonArray[i] as JSONObject
+
         try {
-            val idTeam = jsonObject.getString("idTeam")
-            val name = jsonObject.getString("strTeam")
-            val strTeamShort = jsonObject.getString("strTeamShort")
-            val strAlternate = jsonObject.getString("strAlternate")
-            val intFormedYear = jsonObject.getString("intFormedYear")
-            val strLeague = jsonObject.getString("strLeague")
-            val strStadium = jsonObject.getString("strStadium")
-            val strKeywords = jsonObject.getString("strKeywords")
-            val strStadiumThumb = jsonObject.getString("strStadiumThumb")
-            val strStadiumLocation = jsonObject.getString("strStadiumLocation")
-            val intStadiumCapacity = jsonObject.getString("intStadiumCapacity")
-            val strWebsite = jsonObject.getString("strWebsite")
-            val strTeamJersey = jsonObject.getString("strTeamJersey")
-            val strTeamLogo = jsonObject.getString("strTeamLogo")
+            val idTeam = teams["idTeam"] as String
+            val name = teams["strTeam"] as String
+            val strTeamShort = teams["strTeamShort"] as String
+            val strAlternate = teams["strAlternate"] as String
+            val intFormedYear = teams["intFormedYear"] as String
+            val strLeague = teams["strLeague"] as String
+            val strStadium = teams["strStadium"] as String
+            val strKeywords = teams["strKeywords"] as String
+            val strStadiumThumb = teams["strStadiumThumb"] as String
+            val strStadiumLocation = teams["strStadiumLocation"] as String
+            val intStadiumCapacity = teams["intStadiumCapacity"] as String
+            val strWebsite = teams["strWebsite"] as String
+            val strTeamJersey = teams["strTeamJersey"] as String
+            val strTeamLogo = teams["strTeamLogo"] as String
 
             allLeagues.append("idTeam: $idTeam\n")
             allLeagues.append("name: $name\n")
@@ -143,10 +135,10 @@ fun parseJSON(stb: StringBuilder): String {
             allLeagues.append("strWebsite: $strWebsite\n")
             allLeagues.append("strTeamJersey: $strTeamJersey\n")
             allLeagues.append("strTeamLogo: $strTeamLogo\n")
-
         }catch (jen: JSONException){
-            Log.d("Error","Error")
+
         }
+        allLeagues.append("\n\n")
     }
 
     return allLeagues.toString()
