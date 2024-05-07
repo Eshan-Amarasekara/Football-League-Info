@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Football_League_Info</string>
     <string name="title_activity_search_clubs_by_league">SearchClubsByLeague</string>
+    <string name="title_activity_search_for_clubs">SearchForClubs</string>
 </resources>

@@ -33,16 +33,16 @@ import androidx.compose.ui.unit.dp
 import androidx.room.Room
 import kotlinx.coroutines.launch
 
-lateinit var db: LeagueDatabase
-lateinit var leagueDao: LeagueDao
+lateinit var db1: LeagueDatabase
+lateinit var leagueDao1: LeagueDao
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        db = Room.databaseBuilder(this,
+        db1 = Room.databaseBuilder(this,
             LeagueDatabase::class.java, "LeagueDatabase").build()
-        leagueDao = db.leagueDao()
+        leagueDao1 = db1.leagueDao()
 
         setContent {
             GUI()
@@ -72,7 +72,7 @@ fun GUI() {
                 onClick = {
                     //Adding all leagues to database when button is clicked
                     scope.launch {
-                        leagueDao.insertAll(
+                        leagueDao1.insertAll(
                             League(4328, "English Premier League", "Soccer", "Premier League, EPL"),
                             League(4329, "English League Championship", "Soccer", "Championship"),
                             League(
@@ -160,6 +160,8 @@ fun GUI() {
             Button(
                 onClick = {
                     message = ""
+                    var i = Intent(context, SearchForClubs::class.java)
+                    context.startActivity(i)
                 }, modifier = Modifier
                     .width(130.dp),
                 border = BorderStroke(3.dp, Color(235, 127, 0)),

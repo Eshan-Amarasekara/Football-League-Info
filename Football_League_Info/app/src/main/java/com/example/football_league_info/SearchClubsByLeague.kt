@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,10 +40,15 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
+lateinit var db2: LeagueDatabase
+lateinit var leagueDao2: LeagueDao
 class SearchClubsByLeague : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            db2 = Room.databaseBuilder(
+                this,LeagueDatabase::class.java, "Leagues").build()
+            leagueDao2 = db2.leagueDao()
             GUIButton2()
         }
     }
@@ -159,6 +164,7 @@ fun parseJSON(stb: StringBuilder): String {
     for (i in 0 until jsonArray.length()) {
         try {
         val teams: JSONObject = jsonArray[i] as JSONObject
+
             try {
                 val idTeam = teams["idTeam"] as String
                 allLeagues.append("idTeam: $idTeam\n")
@@ -401,7 +407,7 @@ suspend fun parseDB(stb: StringBuilder) {
                 strTeamLogo = "-"
             }
 
-            leagueDao.insertAllLeagues(
+            leagueDao2.insertAllLeagues(
                 AllLeague(idTeamNum ,
                     strTeam,
                     strAlternate,
