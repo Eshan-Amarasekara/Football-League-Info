@@ -1,3 +1,5 @@
+//Video Link:
+//https://drive.google.com/drive/folders/1C36pZTuF4w0o-06SvIOs11hxvDCAypWs?usp=drive_link
 package com.example.football_league_info
 
 import android.content.Intent
@@ -29,10 +31,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.room.Room
 import kotlinx.coroutines.launch
 
+//Late initialization
 lateinit var db1: LeagueDatabase
 lateinit var leagueDao1: LeagueDao
 
@@ -40,6 +47,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Initialization of instance of Database
         db1 = Room.databaseBuilder(this,
             LeagueDatabase::class.java, "LeagueDatabase").build()
         leagueDao1 = db1.leagueDao()
@@ -59,9 +67,25 @@ fun GUI() {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
+        Spacer(modifier = Modifier.height(26.dp))
+
+        Row {
+            Text(text = "Football League",
+                style = TextStyle(color = Color(235, 127, 0), fontStyle = FontStyle.Italic),
+                fontSize = 42.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+        Row {
+            Text(text = "Information",
+                style = TextStyle(color = Color(235, 127, 0), fontStyle = FontStyle.Italic),
+                fontSize = 42.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+
+
+        Spacer(modifier = Modifier.height(100.dp))
         val context = LocalContext.current
 
         val scope = rememberCoroutineScope()

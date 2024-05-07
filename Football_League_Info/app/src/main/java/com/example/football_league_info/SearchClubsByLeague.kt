@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,15 +69,24 @@ fun GUIButton2() {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(8.dp)
-        ) {
+        )
+        //Input keyword area
+        {
             TextField(
                 value = keyword,
                 onValueChange = { keyword = it },
                 label = { Text("Enter Keyword") },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color(235, 127, 0) ,
+                    focusedContainerColor = Color(235, 127, 0).copy(alpha = 0.2f),
+                    focusedLabelColor = Color(235, 127, 0),
+                )
             )
             Spacer(modifier = Modifier.width(8.dp))
         }
+
+        //Retrieve Button
         Row{
             Button(
                 onClick = {
@@ -95,6 +105,8 @@ fun GUIButton2() {
                 Text("Retrieve Clubs")
             }
         }
+
+        //Save to DB button
         Row{
             Button(
                 onClick = {
@@ -131,12 +143,14 @@ fun GUIButton2() {
     }
 }
 
+//Function to fetch all league details/ also includes saving to DB
 suspend fun fetchLeagueDetails(mode:String, keyword: String): String {
     val urlString = "https://www.thesportsdb.com/api/v1/json/3/search_all_teams.php?l="+keyword
     val url = URL(urlString)
     val con: HttpURLConnection = url.openConnection() as HttpURLConnection
     var stb = StringBuilder()
 
+    //Saving all lines in the JSON to string builder
     withContext(Dispatchers.IO) {
         var bf = BufferedReader(InputStreamReader(con.inputStream))
         var line: String? = bf.readLine()
@@ -155,12 +169,14 @@ suspend fun fetchLeagueDetails(mode:String, keyword: String): String {
     return output
 }
 
+//parseJSON method to retrieve league information
 fun parseJSON(stb: StringBuilder): String {
 
     val json = JSONObject(stb.toString())
     val allLeagues = StringBuilder()
     var jsonArray: JSONArray = json.getJSONArray("teams")
 
+    //Iterating through the saved string builder, error handling added to avoid null value errors
     for (i in 0 until jsonArray.length()) {
         try {
         val teams: JSONObject = jsonArray[i] as JSONObject
@@ -296,6 +312,7 @@ fun parseJSON(stb: StringBuilder): String {
     return allLeagues.toString()
 }
 
+//parseDB uses similar process to above parseJSON, and stores to DB
 suspend fun parseDB(stb: StringBuilder) {
 
     val json = JSONObject(stb.toString())
@@ -428,7 +445,5 @@ suspend fun parseDB(stb: StringBuilder) {
         } catch (jen: JSONException) {
 
         }
-
     }
-
 }

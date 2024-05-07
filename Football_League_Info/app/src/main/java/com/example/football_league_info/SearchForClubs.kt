@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -85,8 +86,17 @@ fun GUIButton3() {
                 .padding(16.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
-        ){
-            TextField(value = keyword, onValueChange = { keyword = it })
+        )
+        //Input keyword area
+        {
+            TextField(value = keyword, onValueChange = { keyword = it },
+                    label = { Text("Enter Keyword") },
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color(235, 127, 0) ,
+                    focusedContainerColor = Color(235, 127, 0).copy(alpha = 0.2f),
+                    focusedLabelColor = Color(235, 127, 0),
+                )
+            )
         }
 
         Row (
@@ -111,6 +121,8 @@ fun GUIButton3() {
             }
 
         }
+
+        //Logs to check logos and club names
         Log.e(logos.toString(),"logo")
         Log.e(clubs.toString(),"name")
 
@@ -128,6 +140,7 @@ fun GUIButton3() {
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                //Iterating through clubs and logos list and displaying
                 for (i in clubs.indices) {
                     Row {
                         if (i < logos.size) {
@@ -146,20 +159,20 @@ fun GUIButton3() {
 }
 
 suspend fun nameGen(Keyword:String):List<String>{
-    val newKeyword=Keyword
-    val club= leagueDao3.searchForLeaguesName(newKeyword)
+    val keyword=Keyword
+    val club= leagueDao3.searchForLeaguesName(keyword)
     Log.e(club.toString(),"name.2")
-
     return club
-
 }
+
 suspend fun getLogo(Keyword:String):List<String>{
-    val newKeyword=Keyword
-    val logos= leagueDao3.strTeamLogo(newKeyword)
+    val keyword=Keyword
+    val logos= leagueDao3.strTeamLogo(keyword)
     return logos
 }
 
-suspend fun getBitmap(url:String?): ImageBitmap? {
+//Using bitmap to get image from URL
+suspend fun useBitmap(url:String?): ImageBitmap? {
     return try {
         withContext(Dispatchers.IO) {
             val input = URL(url).openStream()
@@ -170,13 +183,14 @@ suspend fun getBitmap(url:String?): ImageBitmap? {
     }
 }
 
+//Generating Logo
 @Composable
 fun logoGen(url: String?) {
     var bitmap by rememberSaveable(key = url) { mutableStateOf<ImageBitmap?>(null) }
 
     LaunchedEffect(url) {
         if (!url.isNullOrEmpty()) {
-            bitmap = getBitmap(url)
+            bitmap = useBitmap(url)
         }
     }
     val imageModifier = Modifier
