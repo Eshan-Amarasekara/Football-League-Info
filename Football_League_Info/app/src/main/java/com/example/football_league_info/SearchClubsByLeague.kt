@@ -3,14 +3,19 @@ package com.example.football_league_info
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -21,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +50,11 @@ class SearchClubsByLeague : ComponentActivity() {
 
 @Composable
 fun GUIButton2() {
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         val scope = rememberCoroutineScope()
         var keyword by rememberSaveable { mutableStateOf("") }
         var displayLeagues by rememberSaveable { mutableStateOf("") }
@@ -59,6 +69,8 @@ fun GUIButton2() {
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(8.dp))
+        }
+        Row{
             Button(
                 onClick = {
                     scope.launch {
@@ -66,10 +78,32 @@ fun GUIButton2() {
                     }
                 },
                 modifier = Modifier.padding(top = 8.dp)
+                .width(130.dp),
+                border = BorderStroke(3.dp, Color(235, 127, 0)),
+                shape = RoundedCornerShape(18.dp),
+                colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
             ) {
-                Text("Search")
+                Text("Retrieve Clubs")
             }
-
+        }
+        Row{
+            Button(
+                onClick = {
+                    scope.launch {
+                        displayLeagues = fetchLeagueDetails(keyword)
+                    }
+                },
+                modifier = Modifier.padding(top = 8.dp)
+                .width(130.dp),
+                border = BorderStroke(3.dp, Color(235, 127, 0)),
+                shape = RoundedCornerShape(18.dp),
+                colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
+            ) {
+                Text("Save Clubs")
+            }
+        }
+        Row{
+            Spacer(modifier = Modifier.width(16.dp))
             Text(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 text = displayLeagues

@@ -70,6 +70,7 @@ fun GUI() {
         Row() {
             Button(
                 onClick = {
+                    //Adding all leagues to database when button is clicked
                     scope.launch {
                         leagueDao.insertAll(
                             League(4328, "English Premier League", "Soccer", "Premier League, EPL"),
@@ -124,8 +125,6 @@ fun GUI() {
                     message = "Leagues added to Database"
                 }, modifier = Modifier
                     .width(130.dp),
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = Color.Black),
                 border = BorderStroke(3.dp, Color(235, 127, 0)),
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
@@ -146,8 +145,6 @@ fun GUI() {
                     context.startActivity(i)
                 }, modifier = Modifier
                     .width(130.dp),
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = Color.Black),
                 border = BorderStroke(3.dp, Color(235, 127, 0)),
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
@@ -165,8 +162,6 @@ fun GUI() {
                     message = ""
                 }, modifier = Modifier
                     .width(130.dp),
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = Color.Black),
                 border = BorderStroke(3.dp, Color(235, 127, 0)),
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(Color(235, 127, 0))
